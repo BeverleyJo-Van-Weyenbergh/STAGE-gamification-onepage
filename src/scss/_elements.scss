@@ -1,0 +1,84 @@
+@use 'settings' as *;
+
+body {
+  font-family: $syne;
+  color: $white;
+  font-size: 1rem;
+  min-height: 100vh;
+  background: $purple;
+  position: relative;
+  //overflow: hidden;
+
+  &::before,
+  &::after {
+    content: '';
+    position: fixed;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
+    z-index: -1;
+  }
+}
+
+.bg-blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: -1;
+  will-change: transform;
+  transform-origin: center center;
+
+  &--1 {
+    width: max(80vw, 520px);
+    height: max(80vh, 520px);
+    background: $purple-light;
+    opacity: 0.7;
+    top: -20vh;
+    left: -20vw;
+    animation: drift-1 22s linear infinite;
+  }
+
+  &--2 {
+    width: max(70vw, 460px);
+    height: max(70vh, 460px);
+    background: $purple;
+    opacity: 0.9;
+    top: 10vh;
+    right: -20vw;
+    animation: drift-2 26s linear infinite;
+  }
+
+  &--3 {
+    width: max(60vw, 420px);
+    height: max(65vh, 440px);
+    background: $purple-light;
+    opacity: 0.5;
+    top: 40vh;
+    left: 30vw;
+    animation: drift-3 24s linear infinite;
+  }
+
+  &--4 {
+    width: max(75vw, 500px);
+    height: max(60vh, 420px);
+    background: $purple;
+
+    opacity: 0.8;
+    bottom: -10vh;
+    left: -10vw;
+    animation: drift-4 28s linear infinite;
+  }
+}
+
+h1 {
+  font-family: $funnel;
+  font-size: 2.25rem;
+}
+h2 {
+  font-family: $funnel;
+  font-size: 1.5rem;
+}
+h3 {
+  font-family: $funnel;
+  font-size: 1.25rem;
+}
