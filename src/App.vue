@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import AppBackground from '@/components/AppBackground.vue'
+
+const currentMeetings = 293
+const targetMeetings = 500
+const progressPercent = Math.min(100, Number(((currentMeetings / targetMeetings) * 100).toFixed(1)))
 </script>
 
 <template>
@@ -39,6 +43,28 @@ import AppBackground from '@/components/AppBackground.vue'
         <div class="c-statistics__text">
           <p class="c-statistics__nr">293</p>
           <p class="c-statistics__subtext">Bedrijfsbreed</p>
+        </div>
+      </div>
+    </div>
+    <div class="c-goal">
+      <div class="c-goal__progress card-bg">
+        <p class="c-goal__progress__text">
+          <span
+            ><h2>Maanddoel</h2>
+            {{ currentMeetings }}/{{ targetMeetings }} meetings</span
+          >
+          <span class="c-goal__progress__value">{{ progressPercent }}%</span>
+        </p>
+        <div
+          class="c-goal__progress__bar"
+          role="progressbar"
+          aria-label="Meetingdoel deze maand"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          :aria-valuenow="progressPercent"
+          :aria-valuetext="`${currentMeetings} van ${targetMeetings} meetings`"
+        >
+          <div class="c-goal__progress__fill" :style="{ width: `${progressPercent}%` }"></div>
         </div>
       </div>
     </div>

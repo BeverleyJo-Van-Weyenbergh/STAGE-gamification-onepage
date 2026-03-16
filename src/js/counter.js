@@ -1,5 +1,5 @@
 const init = () => {
-  console.log{'loadingcounter'};
+  console.log('Counter initialized')
 }
 
-document.addEventListener('DOMContentLoaded',init);
+document.addEventListener('DOMContentLoaded', init)
