@@ -1,0 +1,131 @@
+@use 'settings' as *;
+
+@keyframes drift-1 {
+  0% {
+    transform: translate(0vw, 0vh) rotate(0deg);
+  }
+  25% {
+    transform: translate(30vw, 8vh) rotate(90deg);
+  }
+  50% {
+    transform: translate(52vw, 36vh) rotate(180deg);
+  }
+  75% {
+    transform: translate(8vw, 58vh) rotate(270deg);
+  }
+  100% {
+    transform: translate(0vw, 0vh) rotate(360deg);
+  }
+}
+
+@keyframes drift-2 {
+  0% {
+    transform: translate(0vw, 0vh) rotate(0deg);
+  }
+  25% {
+    transform: translate(-32vw, 14vh) rotate(-90deg);
+  }
+  50% {
+    transform: translate(-58vw, 48vh) rotate(-180deg);
+  }
+  75% {
+    transform: translate(-16vw, 70vh) rotate(-270deg);
+  }
+  100% {
+    transform: translate(0vw, 0vh) rotate(-360deg);
+  }
+}
+
+@keyframes drift-3 {
+  0% {
+    transform: translate(0vw, 0vh) rotate(0deg);
+  }
+  25% {
+    transform: translate(24vw, -28vh) rotate(90deg);
+  }
+  50% {
+    transform: translate(-18vw, -52vh) rotate(180deg);
+  }
+  75% {
+    transform: translate(-42vw, 10vh) rotate(270deg);
+  }
+  100% {
+    transform: translate(0vw, 0vh) rotate(360deg);
+  }
+}
+
+@keyframes drift-4 {
+  0% {
+    transform: translate(0vw, 0vh) rotate(0deg);
+  }
+  25% {
+    transform: translate(34vw, -26vh) rotate(90deg);
+  }
+  50% {
+    transform: translate(62vw, -52vh) rotate(180deg);
+  }
+  75% {
+    transform: translate(14vw, -74vh) rotate(270deg);
+  }
+  100% {
+    transform: translate(0vw, 0vh) rotate(360deg);
+  }
+}
+
+.card-bg {
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.02) 52%),
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba($purple-faded, 0.34) 46%,
+      rgba(255, 255, 255, 0.04) 100%
+    ),
+    rgba($purple-dark, 0.2);
+  border-radius: 16px;
+  box-shadow:
+    0 12px 32px rgba(19, 7, 30, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(14px) saturate(140%) brightness(78%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%) brightness(78%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 1.25rem;
+  overflow: hidden;
+}
+
+.card-bg--light {
+  background:
+    linear-gradient(120deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.08) 52%),
+    linear-gradient(
+      135deg,
+      rgba($yellow-light, 0.72) 0%,
+      rgba($yellow-dark, 0.78) 46%,
+      rgba(255, 255, 255, 0.2) 100%
+    ),
+    rgba($yellow-dark, 0.68);
+  border-radius: 16px;
+  box-shadow:
+    0 14px 36px rgba(86, 58, 0, 0.28),
+    0 0 24px rgba($yellow-dark, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(16px) saturate(100%) brightness(108%);
+  -webkit-backdrop-filter: blur(16px) saturate(100%) brightness(108%);
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  padding: 1.25rem;
+  overflow: hidden;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+}

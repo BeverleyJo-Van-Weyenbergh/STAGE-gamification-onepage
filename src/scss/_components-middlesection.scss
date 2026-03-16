@@ -1,0 +1,142 @@
+@use 'settings' as *;
+
+.c-middlesection {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.c-map-container {
+  flex: 0 0 calc(((100% - (1.5rem * 2)) / 3 * 2) + 1.5rem);
+  min-width: 0;
+}
+
+.c-map {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  &__image {
+    display: block;
+    width: 100%;
+    max-height: 340px;
+    object-fit: cover;
+    margin-top: 1rem;
+    border-radius: $border-radius-small;
+  }
+}
+
+.c-stats {
+  flex: 0 0 calc((100% - (1.5rem * 2)) / 3);
+  width: calc((100% - (1.5rem * 2)) / 3);
+  min-width: 0;
+  display: flex;
+  gap: 1.5rem;
+  flex-direction: column;
+
+  > * {
+    width: 100%;
+  }
+
+  &__office {
+    color: $purple-dark;
+    width: 100%;
+    gap: 0.625rem;
+    display: flex;
+    flex-direction: column;
+
+    &__name {
+      font-size: 2.5rem;
+    }
+    &__trend {
+      background-color: $purple-faded;
+      padding: 0.3125rem 0.625rem;
+      border-radius: $border-radius-default;
+      width: fit-content;
+      color: $yellow-light;
+    }
+  }
+  &__users {
+    background-color: aqua;
+    &__title {
+      background-color: aqua;
+    }
+    &__list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    &__name {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 1rem;
+    }
+    &__item {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid $yellow-light;
+    }
+    &__nr {
+      font-size: 1.25rem;
+      //  font-weight: 600;
+      color: $yellow-light;
+    }
+    &__icon {
+      color: $yellow-dark;
+      font-size: 1.25rem;
+      width: 1.25rem;
+      height: 1.25rem;
+      flex: 0 0 1.25rem;
+      line-height: 1;
+      -webkit-text-stroke: 0.5px $yellow-light;
+      font-variation-settings:
+        'FILL' 1,
+        'wght' 500,
+        'GRAD' 0,
+        'opsz' 20;
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .c-middlesection {
+    flex-direction: column;
+  }
+
+  .c-map-container,
+  .c-stats {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .c-stats {
+    flex-direction: row;
+
+    > * {
+      flex: 1 1 0;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .c-middlesection {
+    gap: 1rem;
+  }
+
+  .c-stats {
+    flex-direction: column;
+    gap: 1rem;
+
+    > * {
+      flex: 1 1 auto;
+    }
+  }
+
+  .c-stats__office__name {
+    font-size: 2rem;
+  }
+}
