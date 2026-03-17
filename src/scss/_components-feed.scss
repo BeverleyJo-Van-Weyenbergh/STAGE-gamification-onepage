@@ -68,6 +68,30 @@
       'GRAD' 0,
       'opsz' 20;
   }
+
+  &__tip-text {
+    margin: 0;
+  }
+}
+
+.c-tip-switch-enter-active,
+.c-tip-switch-leave-active {
+  transition:
+    opacity 320ms ease,
+    transform 320ms ease;
+}
+
+.c-tip-switch-enter-from,
+.c-tip-switch-leave-to {
+  opacity: 0;
+  transform: translateY(0.4rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .c-tip-switch-enter-active,
+  .c-tip-switch-leave-active {
+    transition: none;
+  }
 }
 
 @media (max-width: 1024px) {
