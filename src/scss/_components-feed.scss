@@ -37,6 +37,11 @@
       flex: 0 0 auto;
       white-space: nowrap;
     }
+    &__office {
+      display: contents;
+      font-weight: 500;
+      color: $yellow-dark;
+    }
   }
 
   &__tips {

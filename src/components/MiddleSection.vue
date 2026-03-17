@@ -175,6 +175,13 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 0.625rem;
+  container-type: inline-size;
+}
+
+.c-stats__office__name {
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: clamp(1rem, 8cqi, 2rem);
 }
 
 .c-stats__office__dots {
