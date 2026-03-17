@@ -19,7 +19,8 @@ interface FireworkParticle {
   color: string
 }
 
-const fireworkColors = ['#682577', '#e1d8ec', '#30163a', '#7b4988', '#fcf4de', '#fde594']
+const fireworkColors = ['#682577', '#e1d8ec', '#30163a', '#fcf4de', '#fde594', '#ffffff']
+
 const defaultFireworkColor = '#682577'
 const fireworkParticles = ref<FireworkParticle[]>([])
 
@@ -46,16 +47,10 @@ const getParticleStyle = (particle: FireworkParticle): Record<string, string> =>
   '--firework-color': particle.color,
 })
 
-const triggerFireworks = (event: MouseEvent) => {
+const triggerFireworks = () => {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   if (reducedMotion) {
-    return
-  }
-
-  const source = event.currentTarget
-
-  if (!(source instanceof HTMLElement)) {
     return
   }
 
@@ -126,6 +121,7 @@ const progressPercent = computed(() => {
 })
 
 const animatedProgressPercent = ref(0)
+const isGoalComplete = computed(() => progressPercent.value >= 100)
 
 const setProgressTarget = () => {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -157,6 +153,10 @@ watch(progressPercent, (nextValue) => {
   if (props.startAnimation) {
     animatedProgressPercent.value = nextValue
   }
+
+  if (nextValue >= 100) {
+    triggerFireworks()
+  }
 })
 
 onBeforeUnmount(() => {
@@ -166,9 +166,13 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="c-goal">
-    <div class="c-goal__progress card-bg" @mouseenter="triggerFireworks">
-      <p class="c-goal__progress__text">
+    <div class="c-goal__progress card-bg">
+      <p v-if="!isGoalComplete" class="c-goal__progress__text">
         <span>Maanddoel: {{ props.currentMeetings }}/{{ props.targetMeetings }} meetings</span>
+        <span class="c-goal__progress__value">{{ progressPercent }}%</span>
+      </p>
+      <p v-else class="c-goal__progress__text">
+        Maanddoel bereikt proficiat!
         <span class="c-goal__progress__value">{{ progressPercent }}%</span>
       </p>
       <div
