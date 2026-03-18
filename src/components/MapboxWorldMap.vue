@@ -14,23 +14,96 @@ interface Office {
 }
 
 const offices = ref<Office[]>([])
-
-const fetchOffices = async () => {
-  try {
-    const response = await fetch('https://stats.claritalk.com/offices')
-    if (!response.ok) throw new Error('Failed to fetch offices')
-    const data = await response.json()
-    offices.value = data.offices || []
-  } catch (error) {
-    console.error('Failed to fetch offices:', error)
-  }
-}
-
 const mapContainer = ref<HTMLElement | null>(null)
 const mapboxToken = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN ?? ''
 const hasMapboxToken = mapboxToken.length > 0
 
 let map: Map | null = null
+let isMapLoaded = false
+const markers: mapboxgl.Marker[] = []
+
+const clearMarkers = () => {
+  markers.forEach((marker) => marker.remove())
+  markers.length = 0
+}
+
+const hasValidCoordinates = (office: Office) =>
+  Number.isFinite(office.lat) && Number.isFinite(office.lon)
+
+const updateMapViewport = (visibleOffices: Office[]) => {
+  if (!map || visibleOffices.length === 0) {
+    return
+  }
+
+  if (visibleOffices.length === 1) {
+    const [office] = visibleOffices
+
+    if (!office) {
+      return
+    }
+
+    map.easeTo({
+      center: [office.lon, office.lat],
+      zoom: 8.5,
+      duration: 0,
+    })
+    return
+  }
+
+  const bounds = new mapboxgl.LngLatBounds()
+  visibleOffices.forEach((office) => {
+    bounds.extend([office.lon, office.lat])
+  })
+
+  map.fitBounds(bounds, {
+    padding: 56,
+    maxZoom: 8.5,
+    duration: 0,
+  })
+}
+
+const renderOfficesOnMap = () => {
+  if (!map || !isMapLoaded) {
+    return
+  }
+
+  const mapInstance = map
+
+  clearMarkers()
+
+  const visibleOffices = offices.value.filter(hasValidCoordinates)
+
+  visibleOffices.forEach((office) => {
+    const markerElement = createMarkerElement(office.photo_url || '')
+    const popupContent = `
+      <div style=" border-radius: 20px; padding: 12px; min-width: 200px;">
+        <h3 class="c-map__title">${office.name}</h3>
+        <p class="c-map__text">Meetings deze maand: ${office.meetings_this_month}</p>
+        <p class="c-map__text">Actieve gebruikers: ${office.active_users_this_month}</p>
+      </div>
+    `
+    const marker = new mapboxgl.Marker({ element: markerElement })
+      .setLngLat([office.lon, office.lat])
+      .setPopup(new mapboxgl.Popup({ offset: 18 }).setHTML(popupContent))
+      .addTo(mapInstance)
+
+    markers.push(marker)
+  })
+
+  updateMapViewport(visibleOffices)
+}
+
+const fetchOffices = async () => {
+  try {
+    const response = await fetch('https://stats.claritalk.com/offices')
+    if (!response.ok) throw new Error('Failed to fetch offices')
+    const data = (await response.json()) as { offices?: Office[] }
+    offices.value = Array.isArray(data.offices) ? data.offices : []
+    renderOfficesOnMap()
+  } catch (error) {
+    console.error('Failed to fetch offices:', error)
+  }
+}
 
 const createMarkerElement = (imageSrc: string): HTMLElement => {
   const markerDiv = document.createElement('div')
@@ -74,8 +147,9 @@ const createMarkerElement = (imageSrc: string): HTMLElement => {
   return markerDiv
 }
 
-onMounted(() => {
-  fetchOffices()
+onMounted(async () => {
+  await fetchOffices()
+
   if (!mapContainer.value || !hasMapboxToken) {
     return
   }
@@ -92,28 +166,20 @@ onMounted(() => {
   map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right')
 
   map.on('load', () => {
-    offices.value.forEach((office) => {
-      const markerElement = createMarkerElement(office.photo_url || '')
-      const popupContent = `
-        <div style=" border-radius: 20px; padding: 12px; min-width: 200px;">
-          <h3 class="c-map__title">${office.name}</h3>
-          <p class="c-map__text">Meetings deze maand: ${office.meetings_this_month}</p>
-          <p class="c-map__text">Actieve gebruikers: ${office.active_users_this_month}</p>
-        </div>
-      `
-      new mapboxgl.Marker({ element: markerElement })
-        .setLngLat([office.lon, office.lat])
-        .setPopup(new mapboxgl.Popup({ offset: 18 }).setHTML(popupContent))
-        .addTo(map!)
-    })
+    isMapLoaded = true
+    renderOfficesOnMap()
   })
 })
 
 onBeforeUnmount(() => {
+  clearMarkers()
+
   if (map) {
     map.remove()
     map = null
   }
+
+  isMapLoaded = false
 })
 </script>
 

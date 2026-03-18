@@ -6,19 +6,19 @@ export interface Tip {
 export const arrTips: Tip[] = [
   {
     id: 1,
-    tip: 'Gebruikers hebben gemiddeld 2 uur per week minder administratie.',
+    tip: 'Je bespaart tot 30% tijd per meeting doordat samenvattingen automatisch worden gegenereerd.',
   },
   {
     id: 2,
-    tip: 'Deze maand zijn er 420 automatische actiepunten gegenereerd.',
+    tip: 'Manuele notities maken is niet meer nodig, omdat elk gesprek automatisch wordt vastgelegd.',
   },
   {
     id: 3,
-    tip: 'Er zijn 2.450 gesprekken geanalyseerd deze maand.',
+    tip: 'Belangrijke informatie vind je in seconden terug dankzij doorzoekbare transcripties.',
   },
   {
     id: 4,
-    tip: 'Gebruikers hebben gemiddeld 30% minder tijd nodig voor verslaggeving van meetings.',
+    tip: 'Teams werken efficiënter samen doordat iedereen toegang heeft tot dezelfde inzichten.',
   },
   {
     id: 5,

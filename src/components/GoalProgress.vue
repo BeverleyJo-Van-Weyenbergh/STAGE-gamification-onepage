@@ -120,6 +120,8 @@ const progressPercent = computed(() => {
   return Math.min(100, Number(((props.currentMeetings / props.targetMeetings) * 100).toFixed(1)))
 })
 
+const isTargetMissing = computed(() => props.targetMeetings <= 0)
+
 const animatedProgressPercent = ref(0)
 const isGoalComplete = computed(() => progressPercent.value >= 100)
 
@@ -165,7 +167,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="c-goal">
+  <div v-if="!isTargetMissing" class="c-goal">
     <div class="c-goal__progress card-bg">
       <p v-if="!isGoalComplete" class="c-goal__progress__text">
         <span>Maanddoel: {{ props.currentMeetings }}/{{ props.targetMeetings }} meetings</span>

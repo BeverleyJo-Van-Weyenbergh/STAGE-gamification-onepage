@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { arrTips } from '@/data/weetjes'
 
 const props = defineProps<{
@@ -9,29 +9,62 @@ const props = defineProps<{
 interface RecentMeeting {
   user_name: string
   office: string
-  time: string
+  started_at: string
+}
+
+interface RecentMeetingApi {
+  user_name?: string
+  office?: string
+  updated_at?: string
+  updatedAt?: string
+  created_at?: string
+}
+
+interface RecentMeetingsResponse {
+  recent_meetings?: RecentMeetingApi[]
 }
 
 const recentMeetings = ref<RecentMeeting[]>([])
+let recentMeetingsInterval: ReturnType<typeof setInterval> | null = null
+
+const getStartedAt = (meeting: RecentMeetingApi) =>
+  meeting.created_at ?? meeting.updated_at ?? meeting.updatedAt ?? ''
 
 const fetchRecentMeetings = async () => {
   try {
-    const response = await fetch(
-      `https://stats.claritalk.com/stats/recent-meetings?t=${Date.now()}`,
-      { cache: 'no-store' },
-    )
+    const response = await fetch(`https://stats.claritalk.com/stats/recent-meetings`)
     if (!response.ok) throw new Error('Failed to fetch recent meetings')
-    const data = await response.json()
-    recentMeetings.value = (data.recent_meetings ?? []).slice(0, 3)
+    const data: RecentMeetingsResponse = await response.json()
+    const meetings = Array.isArray(data.recent_meetings) ? [...data.recent_meetings] : []
+    const meetingsByStartedAt = meetings.sort((meetingA, meetingB) =>
+      getStartedAt(meetingB).localeCompare(getStartedAt(meetingA)),
+    )
+
+    recentMeetings.value = meetingsByStartedAt.slice(0, 3).map((meeting) => ({
+      user_name: meeting.user_name ?? 'Onbekende gebruiker',
+      office: meeting.office ?? 'een Titeca kantoor',
+      started_at: getStartedAt(meeting),
+    }))
   } catch (error) {
     console.error('Failed to fetch recent meetings:', error)
   }
 }
 
-const formatTime = (isoString: string) => isoString.slice(11, 16)
+const formatTime = (dateTime: string) => (dateTime ? dateTime.slice(11, 16) : '--:--')
 
 onMounted(() => {
   fetchRecentMeetings()
+
+  recentMeetingsInterval = setInterval(() => {
+    void fetchRecentMeetings()
+  }, 15000)
+})
+
+onBeforeUnmount(() => {
+  if (recentMeetingsInterval) {
+    clearInterval(recentMeetingsInterval)
+    recentMeetingsInterval = null
+  }
 })
 
 const currentTipIndex = ref(0)
@@ -66,12 +99,12 @@ watch(
       <ul class="c-feed__list">
         <li
           v-for="meeting in recentMeetings"
-          :key="meeting.time + meeting.user_name"
+          :key="meeting.started_at + meeting.user_name"
           class="c-feed__list__item"
         >
-          {{ meeting.user_name }} heeft een meeting in
-          <span class="c-feed__list__office">{{ meeting.office }}</span> gestart
-          <div class="c-feed__list__time">{{ formatTime(meeting.time) }}</div>
+          {{ meeting.user_name }} had een meeting in
+          <span class="c-feed__list__office">{{ meeting.office }}</span>
+          <div class="c-feed__list__time">{{ formatTime(meeting.started_at) }}</div>
         </li>
       </ul>
     </div>

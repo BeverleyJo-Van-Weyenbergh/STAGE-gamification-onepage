@@ -2,6 +2,7 @@
 
 .c-middlesection {
   display: flex;
+  align-items: stretch;
   gap: 1.5rem;
   margin-top: 1.5rem;
 }
@@ -9,18 +10,145 @@
 .c-map-container {
   flex: 0 0 calc(((100% - (1.5rem * 2)) / 3 * 2) + 1.5rem);
   min-width: 0;
+  display: flex;
 }
 
 .c-map {
   width: 100%;
   max-width: none;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  &__tabs {
+    display: inline-flex;
+    gap: 0.5rem;
+    padding: 0.25rem;
+    border-radius: $border-radius-default;
+    background: rgba($white, 0.08);
+    border: 1px solid rgba($white, 0.14);
+  }
+
+  &__tab {
+    border: 1px solid transparent;
+    background: transparent;
+    color: $yellow-light;
+    border-radius: 999px;
+    padding: 0.35rem 0.9rem;
+    font-family: $funnel;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+
+    &:hover {
+      background: rgba($white, 0.1);
+    }
+
+    &.is-active {
+      background: linear-gradient(
+        145deg,
+        rgba($yellow-light, 0.9) 0%,
+        rgba($yellow-dark, 0.85) 55%,
+        rgba($yellow-dark, 0.72) 100%
+      );
+      color: $purple-dark;
+      border-color: rgba($white, 0.4);
+      box-shadow: 0 6px 14px rgba($purple-dark, 0.22);
+    }
+  }
+
+  &__panel {
+    margin-top: 0.9rem;
+    height: 100%;
+  }
+
+  &__panel--offices {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+  }
+
+  &__panel--graph {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__graph-title {
+    font-size: 1.35rem;
+    margin: 0;
+  }
+
+  &__graph-subtitle {
+    margin: 0.25rem 0 0.85rem;
+    color: rgba($yellow-light, 0.8);
+    font-size: 0.9rem;
+  }
+
+  &__graph {
+    flex: 0 0 auto;
+    min-height: 0;
+  }
+
+  &__graph-svg {
+    width: 100%;
+    height: clamp(11rem, 22vh, 13.5rem);
+    min-height: 11rem;
+    display: block;
+  }
+
+  &__graph-grid {
+    stroke: rgba($white, 0.2);
+    stroke-width: 1;
+    stroke-dasharray: 2 5;
+  }
+
+  &__graph-axis-label {
+    fill: rgba($yellow-light, 0.75);
+    font-size: 0.85rem;
+  }
+
+  &__graph-area {
+    fill: rgba($yellow-dark, 0.14);
+  }
+
+  &__graph-line {
+    fill: none;
+    stroke: $yellow-dark;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  &__graph-point {
+    fill: $yellow-light;
+    stroke: $yellow-dark;
+    stroke-width: 2;
+  }
+
+  &__graph-value {
+    fill: rgba($yellow-light, 0.95);
+    font-size: 1.08rem;
+    font-weight: 600;
+  }
+
+  &__graph-month {
+    fill: rgba($white, 0.9);
+    font-size: 0.9rem;
+  }
+
+  &__graph-empty {
+    color: rgba($yellow-light, 0.85);
+    margin: 0.25rem 0 0;
+  }
+
   &__map,
   &__fallback {
     display: block;
     width: 100%;
-    min-height: 350px;
-    margin-top: 1rem;
+    min-height: 0;
+    height: 100%;
+    margin-top: 0;
     border-radius: $border-radius-small;
   }
   &__title {
@@ -40,8 +168,8 @@
 
   &__map .mapboxgl-map,
   &__map .mapboxgl-canvas {
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    height: 100% !important;
   }
 
   &__fallback {
@@ -185,11 +313,42 @@
       flex: 1 1 0;
     }
   }
+
+  .c-map {
+    &__map,
+    &__fallback {
+      min-height: 320px;
+      height: auto;
+    }
+  }
 }
 
 @media (max-width: 768px) {
   .c-middlesection {
     gap: 1rem;
+  }
+
+  .c-map {
+    &__tab {
+      font-size: 0.88rem;
+      padding: 0.3rem 0.7rem;
+    }
+
+    &__graph-svg {
+      height: clamp(10rem, 24vh, 12rem);
+      min-height: 10rem;
+    }
+
+    &__graph-month,
+    &__graph-axis-label {
+      font-size: 0.78rem;
+    }
+
+    &__map,
+    &__fallback {
+      min-height: 280px;
+      height: auto;
+    }
   }
 
   .c-stats {
