@@ -21,6 +21,15 @@ const hasMapboxToken = mapboxToken.length > 0
 let map: Map | null = null
 let isMapLoaded = false
 const markers: mapboxgl.Marker[] = []
+let resizeObserver: ResizeObserver | null = null
+
+const resizeMap = () => {
+  if (!map) {
+    return
+  }
+
+  map.resize()
+}
 
 const clearMarkers = () => {
   markers.forEach((marker) => marker.remove())
@@ -163,15 +172,29 @@ onMounted(async () => {
     attributionControl: false,
   })
 
+  resizeObserver = new ResizeObserver(() => {
+    resizeMap()
+  })
+  resizeObserver.observe(mapContainer.value)
+
   map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right')
 
   map.on('load', () => {
     isMapLoaded = true
+    resizeMap()
+    requestAnimationFrame(() => {
+      resizeMap()
+    })
     renderOfficesOnMap()
   })
 })
 
 onBeforeUnmount(() => {
+  if (resizeObserver) {
+    resizeObserver.disconnect()
+    resizeObserver = null
+  }
+
   clearMarkers()
 
   if (map) {

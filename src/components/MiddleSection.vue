@@ -98,6 +98,18 @@ const formatMonthLabel = (monthKey: string) => {
   return new Intl.DateTimeFormat('nl-BE', { month: 'short' }).format(date)
 }
 
+const getRankIcon = (rank: number) => {
+  if (rank === 1) {
+    return 'crown'
+  }
+
+  if (rank === 2) {
+    return 'electric_bolt'
+  }
+
+  return 'kid_star'
+}
+
 const fetchMiddleSectionData = async () => {
   try {
     const res = await fetch(`https://stats.claritalk.com/stats?t=${Date.now()}`, {
@@ -171,19 +183,14 @@ const fetchMeetingsPerMonth = async () => {
   }
 }
 
-const chartMaxValue = computed(() =>
-  monthlyMeetings.value.reduce((maxValue, point) => Math.max(maxValue, point.meeting_count), 0),
-)
-
 const chartScaleMax = computed(() => {
-  const tickStep = Math.max(1, Math.ceil(Math.max(chartMaxValue.value, 1) / 4))
+  const maxValue = monthlyMeetings.value.reduce(
+    (highestValue, point) => Math.max(highestValue, point.meeting_count),
+    0,
+  )
+  const tickStep = Math.max(1, Math.ceil(Math.max(maxValue, 1) / 4))
   return tickStep * 4
 })
-
-interface ChartTick {
-  value: number
-  y: number
-}
 
 interface ChartPoint {
   month: string
@@ -191,19 +198,6 @@ interface ChartPoint {
   x: number
   y: number
 }
-
-const chartTicks = computed<ChartTick[]>(() => {
-  const tickStep = chartScaleMax.value / 4
-
-  return Array.from({ length: 5 }, (_, index) => {
-    const value = index * tickStep
-
-    return {
-      value,
-      y: graphPaddingTop + graphPlotHeight - (value / chartScaleMax.value) * graphPlotHeight,
-    }
-  })
-})
 
 const chartPoints = computed<ChartPoint[]>(() => {
   if (monthlyMeetings.value.length === 0) {
@@ -307,7 +301,7 @@ onBeforeUnmount(() => {
             :aria-selected="activeMapTab === 'graph'"
             @click="activeMapTab = 'graph'"
           >
-            Graph
+            6 maanden grafiek
           </button>
         </div>
 
@@ -326,24 +320,6 @@ onBeforeUnmount(() => {
               role="img"
               aria-label="Gedetailleerde meetingtrend van de laatste 6 maanden"
             >
-              <g v-for="tick in chartTicks" :key="tick.value">
-                <line
-                  class="c-map__graph-grid"
-                  :x1="graphPaddingLeft"
-                  :y1="tick.y"
-                  :x2="graphWidth - graphPaddingRight"
-                  :y2="tick.y"
-                />
-                <text
-                  class="c-map__graph-axis-label"
-                  :x="graphPaddingLeft - 8"
-                  :y="tick.y + 4"
-                  text-anchor="end"
-                >
-                  {{ tick.value }}
-                </text>
-              </g>
-
               <path class="c-map__graph-area" :d="chartAreaPath" />
               <path class="c-map__graph-line" :d="chartLinePath" />
 
@@ -397,7 +373,7 @@ onBeforeUnmount(() => {
               <p>{{ user.name }}</p>
             </div>
             <span class="material-symbols-outlined c-stats__users__icon" aria-hidden="true">
-              {{ user.rank === 1 ? 'crown' : user.rank === 2 ? 'electric_bolt' : 'kid_star' }}
+              {{ getRankIcon(user.rank) }}
             </span>
           </li>
         </ul>
@@ -405,62 +381,3 @@ onBeforeUnmount(() => {
     </div>
   </div>
 </template>
-
-<style scoped>
-.c-stats__office__content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.625rem;
-  container-type: inline-size;
-}
-
-.c-stats__office__name {
-  white-space: nowrap;
-  overflow: hidden;
-  font-size: clamp(1rem, 8cqi, 2rem);
-}
-
-.c-stats__office__dots {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  margin-top: 0.25rem;
-}
-
-.c-stats__office__dot {
-  width: 0.42rem;
-  height: 0.42rem;
-  border-radius: 999px;
-  background: rgba(104, 37, 119, 0.35);
-  transition:
-    width 260ms ease,
-    background-color 260ms ease,
-    transform 260ms ease;
-}
-
-.c-stats__office__dot.is-active {
-  width: 1.2rem;
-  background: #682577;
-  transform: translateY(-1px);
-}
-
-.highlight-rotate-enter-active,
-.highlight-rotate-leave-active {
-  transition:
-    opacity 360ms ease,
-    transform 360ms ease,
-    filter 360ms ease;
-}
-
-.highlight-rotate-enter-from {
-  opacity: 0;
-  transform: translateY(10px);
-  filter: blur(1.5px);
-}
-
-.highlight-rotate-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
-  filter: blur(1.5px);
-}
-</style>

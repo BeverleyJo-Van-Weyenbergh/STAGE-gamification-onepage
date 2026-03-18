@@ -113,12 +113,12 @@ onBeforeUnmount(() => {
           : 'Bedrijfsnaam niet meegegeven'
       }}
     </h1>
+    <div class="c-title__signup card-bg">
+      <button class="c-title__signup__link" type="button" @click="openSignupModal">
+        Investeer in jezelf, schrijf je hier in voor een training!
+      </button>
+    </div>
     <div class="c-title__right">
-      <div class="c-title__signup card-bg">
-        <button class="c-title__signup__link" type="button" @click="openSignupModal">
-          Investeer in jezelf, schrijf je hier in voor een training!
-        </button>
-      </div>
       <div class="c-title__live">
         <div class="c-title__live__circle"></div>
         <p class="c-title__live__text">Live</p>

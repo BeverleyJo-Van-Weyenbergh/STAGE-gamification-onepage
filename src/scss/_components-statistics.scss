@@ -25,10 +25,17 @@
     flex-direction: row;
     gap: 1rem;
     align-items: center;
+    min-width: 0;
   }
 
   &__nr {
-    font-size: 4rem;
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    line-height: 1;
+  }
+
+  &__subtext {
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   &__graph {
@@ -98,6 +105,24 @@
 
     &__graph-label {
       font-size: 0.7rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    &__title {
+      font-size: 1.25rem;
+    }
+
+    &__nr {
+      font-size: clamp(1.9rem, 13vw, 2.7rem);
+    }
+
+    &__graph-svg {
+      height: 5rem;
+    }
+
+    &__graph-label {
+      font-size: 0.62rem;
     }
   }
 }
