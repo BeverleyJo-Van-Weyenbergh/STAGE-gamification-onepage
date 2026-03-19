@@ -49,6 +49,10 @@ interface MeetingsPerMonthResponse {
   months?: MeetingsPerMonthApiEntry[]
 }
 
+interface OfficesResponse {
+  offices?: unknown[]
+}
+
 interface MonthlyMeetingPoint {
   month: string
   meeting_count: number
@@ -65,17 +69,37 @@ const topUsers = ref<TopUser[]>([])
 const highlights = ref<HighlightItem[]>([])
 const currentHighlightIndex = ref(0)
 const activeMapTab = ref<'offices' | 'graph'>('offices')
+const hasMultipleOffices = ref(true)
 const monthlyMeetings = ref<MonthlyMeetingPoint[]>([])
 let monthlyMeetingsInterval: ReturnType<typeof setInterval> | null = null
+let compactGraphMediaQuery: MediaQueryList | null = null
+const isCompactGraph = ref(false)
 
-const graphWidth = 1200
-const graphHeight = 260
-const graphPaddingTop = 18
-const graphPaddingRight = 20
-const graphPaddingBottom = 52
-const graphPaddingLeft = 44
-const graphPlotWidth = graphWidth - graphPaddingLeft - graphPaddingRight
-const graphPlotHeight = graphHeight - graphPaddingTop - graphPaddingBottom
+const updateCompactGraphMode = () => {
+  isCompactGraph.value = compactGraphMediaQuery?.matches ?? false
+}
+
+const graphWidth = computed(() => (isCompactGraph.value ? 760 : 1200))
+const graphHeight = computed(() => (isCompactGraph.value ? 380 : 260))
+const graphPaddingTop = computed(() => (isCompactGraph.value ? 28 : 18))
+const graphPaddingRight = computed(() => (isCompactGraph.value ? 26 : 20))
+const graphPaddingBottom = computed(() => (isCompactGraph.value ? 76 : 52))
+const graphPaddingLeft = computed(() => (isCompactGraph.value ? 52 : 44))
+const graphPlotWidth = computed(
+  () => graphWidth.value - graphPaddingLeft.value - graphPaddingRight.value,
+)
+const graphPlotHeight = computed(
+  () => graphHeight.value - graphPaddingTop.value - graphPaddingBottom.value,
+)
+
+const shouldShowMonthLabel = (index: number, total: number) => {
+  if (!isCompactGraph.value || total <= 3) {
+    return true
+  }
+
+  const middleIndex = Math.round((total - 1) / 2)
+  return index === 0 || index === middleIndex || index === total - 1
+}
 
 const fallbackHighlight: HighlightItem = {
   kind: 'office',
@@ -108,6 +132,28 @@ const getRankIcon = (rank: number) => {
   }
 
   return 'kid_star'
+}
+
+const fetchOfficesVisibility = async () => {
+  try {
+    const response = await fetch('https://stats.claritalk.com/offices')
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+
+    const data: OfficesResponse = await response.json()
+    const offices = Array.isArray(data.offices) ? data.offices : []
+
+    hasMultipleOffices.value = offices.length > 1
+
+    if (!hasMultipleOffices.value) {
+      activeMapTab.value = 'graph'
+    }
+  } catch (error) {
+    console.error('Failed to determine offices visibility:', error)
+    hasMultipleOffices.value = true
+  }
 }
 
 const fetchMiddleSectionData = async () => {
@@ -205,20 +251,22 @@ const chartPoints = computed<ChartPoint[]>(() => {
   }
 
   const pointCount = monthlyMeetings.value.length
-  const stepX = pointCount > 1 ? graphPlotWidth / (pointCount - 1) : 0
+  const stepX = pointCount > 1 ? graphPlotWidth.value / (pointCount - 1) : 0
 
   return monthlyMeetings.value.map((meeting, index) => {
     const x =
-      pointCount === 1 ? graphPaddingLeft + graphPlotWidth / 2 : graphPaddingLeft + stepX * index
+      pointCount === 1
+        ? graphPaddingLeft.value + graphPlotWidth.value / 2
+        : graphPaddingLeft.value + stepX * index
 
     return {
       month: meeting.month,
       meeting_count: meeting.meeting_count,
       x,
       y:
-        graphPaddingTop +
-        graphPlotHeight -
-        (meeting.meeting_count / chartScaleMax.value) * graphPlotHeight,
+        graphPaddingTop.value +
+        graphPlotHeight.value -
+        (meeting.meeting_count / chartScaleMax.value) * graphPlotHeight.value,
     }
   })
 })
@@ -245,7 +293,7 @@ const chartAreaPath = computed(() => {
     return ''
   }
 
-  const bottomY = graphPaddingTop + graphPlotHeight
+  const bottomY = graphPaddingTop.value + graphPlotHeight.value
 
   return `${chartLinePath.value} L ${lastPoint.x} ${bottomY} L ${firstPoint.x} ${bottomY} Z`
 })
@@ -262,6 +310,11 @@ watch(
 )
 
 onMounted(() => {
+  compactGraphMediaQuery = window.matchMedia('(max-width: 768px)')
+  updateCompactGraphMode()
+  compactGraphMediaQuery.addEventListener('change', updateCompactGraphMode)
+
+  void fetchOfficesVisibility()
   void fetchMiddleSectionData()
   void fetchMeetingsPerMonth()
 
@@ -271,6 +324,11 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  if (compactGraphMediaQuery) {
+    compactGraphMediaQuery.removeEventListener('change', updateCompactGraphMode)
+    compactGraphMediaQuery = null
+  }
+
   if (monthlyMeetingsInterval) {
     clearInterval(monthlyMeetingsInterval)
     monthlyMeetingsInterval = null
@@ -282,7 +340,7 @@ onBeforeUnmount(() => {
   <div class="c-middlesection">
     <div class="c-map-container">
       <div class="c-map card-bg">
-        <div class="c-map__tabs" role="tablist" aria-label="Kantoren en graph">
+        <div v-if="hasMultipleOffices" class="c-map__tabs" role="tablist" aria-label="Kantoren en graph">
           <button
             class="c-map__tab"
             :class="{ 'is-active': activeMapTab === 'offices' }"
@@ -305,11 +363,18 @@ onBeforeUnmount(() => {
           </button>
         </div>
 
-        <div v-if="activeMapTab === 'offices'" class="c-map__panel c-map__panel--offices">
+        <div
+          v-if="hasMultipleOffices && activeMapTab === 'offices'"
+          class="c-map__panel c-map__panel--offices"
+        >
           <MapboxWorldMap />
         </div>
 
-        <div v-else class="c-map__panel c-map__panel--graph">
+        <div
+          v-else
+          class="c-map__panel c-map__panel--graph"
+          :class="{ 'c-map__panel--graph-only': !hasMultipleOffices }"
+        >
           <h3 class="c-map__graph-title">Meetings per maand</h3>
           <p class="c-map__graph-subtitle">Laatste 6 maanden</p>
 
@@ -323,20 +388,21 @@ onBeforeUnmount(() => {
               <path class="c-map__graph-area" :d="chartAreaPath" />
               <path class="c-map__graph-line" :d="chartLinePath" />
 
-              <g v-for="point in chartPoints" :key="point.month">
+              <g v-for="(point, index) in chartPoints" :key="point.month">
                 <circle class="c-map__graph-point" :cx="point.x" :cy="point.y" r="4" />
                 <text
                   class="c-map__graph-value"
                   :x="point.x"
-                  :y="point.y - 10"
+                  :y="point.y - (isCompactGraph ? 12 : 10)"
                   text-anchor="middle"
                 >
                   {{ point.meeting_count }}
                 </text>
                 <text
+                  v-if="shouldShowMonthLabel(index, chartPoints.length)"
                   class="c-map__graph-month"
                   :x="point.x"
-                  :y="graphHeight - 14"
+                  :y="graphHeight - (isCompactGraph ? 20 : 14)"
                   text-anchor="middle"
                 >
                   {{ formatMonthLabel(point.month) }}

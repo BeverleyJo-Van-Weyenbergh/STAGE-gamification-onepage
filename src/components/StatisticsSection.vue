@@ -21,6 +21,10 @@ interface MeetingsPerMonthResponse {
   months?: MeetingsPerMonthApiEntry[]
 }
 
+interface OfficesResponse {
+  offices?: unknown[]
+}
+
 interface MonthlyMeeting {
   month: string
   meeting_count: number
@@ -28,6 +32,7 @@ interface MonthlyMeeting {
 
 const statsCardsVisible = ref([false, false, false, false])
 const monthlyMeetings = ref<MonthlyMeeting[]>([])
+const showMiniGraph = ref(true)
 const statsAnimationTimeouts: number[] = []
 let hasStartedAnimation = false
 let monthlyMeetingsInterval: ReturnType<typeof setInterval> | null = null
@@ -45,6 +50,23 @@ const formatMonthLabel = (monthKey: string) => {
   }
 
   return new Intl.DateTimeFormat('nl-BE', { month: 'short' }).format(date)
+}
+
+const fetchOfficesVisibility = async () => {
+  try {
+    const response = await fetch('https://stats.claritalk.com/offices')
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`)
+    }
+
+    const data: OfficesResponse = await response.json()
+    const offices = Array.isArray(data.offices) ? data.offices : []
+    showMiniGraph.value = offices.length > 1
+  } catch (error) {
+    console.error('Failed to determine statistics graph visibility:', error)
+    showMiniGraph.value = true
+  }
 }
 
 const fetchMeetingsPerMonth = async () => {
@@ -141,9 +163,10 @@ const clearAnimationTimeouts = () => {
 
 const runStatsAnimation = () => {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const cardsToAnimate = showMiniGraph.value ? 4 : 3
 
   if (reducedMotion) {
-    statsCardsVisible.value = [true, true, true]
+    statsCardsVisible.value = [true, true, true, showMiniGraph.value]
     emit('animation-complete')
     return
   }
@@ -152,7 +175,7 @@ const runStatsAnimation = () => {
   const stepDelayMs = 180
   const cardRevealDurationMs = 420
 
-  statsCardsVisible.value.forEach((_, index) => {
+  Array.from({ length: cardsToAnimate }, (_, index) => index).forEach((index) => {
     const timeoutId = window.setTimeout(
       () => {
         statsCardsVisible.value[index] = true
@@ -164,7 +187,7 @@ const runStatsAnimation = () => {
   })
 
   const totalDelayMs =
-    baseDelayMs + stepDelayMs * (statsCardsVisible.value.length - 1) + cardRevealDurationMs
+    baseDelayMs + stepDelayMs * (cardsToAnimate - 1) + cardRevealDurationMs
 
   const completionTimeoutId = window.setTimeout(() => {
     emit('animation-complete')
@@ -196,11 +219,17 @@ onBeforeUnmount(() => {
 })
 
 onMounted(() => {
-  void fetchMeetingsPerMonth()
+  void fetchOfficesVisibility().then(() => {
+    if (!showMiniGraph.value) {
+      return
+    }
 
-  monthlyMeetingsInterval = setInterval(() => {
     void fetchMeetingsPerMonth()
-  }, 60000)
+
+    monthlyMeetingsInterval = setInterval(() => {
+      void fetchMeetingsPerMonth()
+    }, 60000)
+  })
 })
 </script>
 
@@ -227,7 +256,7 @@ onMounted(() => {
         <p class="c-statistics__subtext">Bedrijfsbreed</p>
       </div>
     </div>
-    <div class="c-statistics__card card-bg" :class="{ 'is-visible': statsCardsVisible[3] }">
+    <div v-if="showMiniGraph" class="c-statistics__card card-bg" :class="{ 'is-visible': statsCardsVisible[3] }">
       <h2 class="c-statistics__title">Laatste 6 maanden</h2>
       <div v-if="chartPoints.length > 0" class="c-statistics__graph">
         <svg

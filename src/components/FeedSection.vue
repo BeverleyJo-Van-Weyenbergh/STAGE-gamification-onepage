@@ -102,9 +102,11 @@ watch(
           :key="meeting.started_at + meeting.user_name"
           class="c-feed__list__item"
         >
-          {{ meeting.user_name }} had een meeting in
-          <span class="c-feed__list__office">{{ meeting.office }}</span>
-          <div class="c-feed__list__time">{{ formatTime(meeting.started_at) }}</div>
+          <p class="c-feed__list__sentence">{{ meeting.user_name }} had een meeting in</p>
+          <div class="c-feed__list__meta">
+            <span class="c-feed__list__office">{{ meeting.office }}</span>
+            <span class="c-feed__list__time">{{ formatTime(meeting.started_at) }}</span>
+          </div>
         </li>
       </ul>
     </div>
