@@ -8,6 +8,16 @@
   &__card {
     width: 100%;
     min-width: 0;
+    opacity: 0;
+    transform: translateY(1.125rem);
+    transition:
+      opacity 420ms ease,
+      transform 420ms cubic-bezier(0.2, 0.65, 0.2, 1);
+  }
+
+  &__card.is-visible {
+    opacity: 1;
+    transform: translateY(0);
   }
 
   &__text {
@@ -15,11 +25,52 @@
     flex-direction: row;
     gap: 1rem;
     align-items: center;
+    min-width: 0;
   }
 
   &__nr {
-    font-size: 4rem;
- 
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    line-height: 1;
+  }
+
+  &__subtext {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  &__graph {
+    margin-top: 0.5rem;
+  }
+
+  &__graph-svg {
+    width: 100%;
+    height: 6rem;
+    display: block;
+  }
+
+  &__graph-area {
+    fill: rgba($yellow-dark, 0.18);
+  }
+
+  &__graph-line {
+    fill: none;
+    stroke: $yellow-dark;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  &__graph-point {
+    fill: $yellow-light;
+    stroke: $yellow-dark;
+    stroke-width: 2;
+  }
+
+  &__graph-label {
+    fill: rgba($white, 0.85);
+    font-size: 0.75rem;
+    dominant-baseline: ideographic;
+    pointer-events: none;
   }
 
   @media (max-width: 1024px) {
@@ -51,5 +102,35 @@
     &__nr {
       font-size: clamp(2.5rem, 11vw, 3.5rem);
     }
+
+    &__graph-label {
+      font-size: 0.7rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    &__title {
+      font-size: 1.25rem;
+    }
+
+    &__nr {
+      font-size: clamp(1.9rem, 13vw, 2.7rem);
+    }
+
+    &__graph-svg {
+      height: 5rem;
+    }
+
+    &__graph-label {
+      font-size: 0.62rem;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .c-statistics__card {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }

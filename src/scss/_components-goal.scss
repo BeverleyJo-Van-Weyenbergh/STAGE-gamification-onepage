@@ -44,3 +44,23 @@
     }
   }
 }
+
+@media (max-width: 768px) {
+  .c-goal {
+    &__progress {
+      &__text {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.35rem;
+      }
+
+      &__value {
+        font-size: clamp(1.05rem, 4.5vw, 1.35rem);
+      }
+
+      &__bar {
+        height: 0.75rem;
+      }
+    }
+  }
+}

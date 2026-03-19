@@ -2,6 +2,7 @@
 
 .c-middlesection {
   display: flex;
+  align-items: stretch;
   gap: 1.5rem;
   margin-top: 1.5rem;
 }
@@ -9,19 +10,191 @@
 .c-map-container {
   flex: 0 0 calc(((100% - (1.5rem * 2)) / 3 * 2) + 1.5rem);
   min-width: 0;
+  display: flex;
 }
 
 .c-map {
   width: 100%;
   max-width: none;
   height: 100%;
-  &__image {
+  display: flex;
+  flex-direction: column;
+
+  &__tabs {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.25rem;
+    border-radius: $border-radius-default;
+    background: rgba($white, 0.08);
+    border: 1px solid rgba($white, 0.14);
+  }
+
+  &__tab {
+    border: 1px solid transparent;
+    background: transparent;
+    color: $yellow-light;
+    border-radius: 999px;
+    padding: 0.35rem 0.9rem;
+    font-family: $funnel;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.25s ease;
+
+    &:hover {
+      background: rgba($white, 0.1);
+    }
+
+    &.is-active {
+      background: linear-gradient(
+        145deg,
+        rgba($yellow-light, 0.9) 0%,
+        rgba($yellow-dark, 0.85) 55%,
+        rgba($yellow-dark, 0.72) 100%
+      );
+      color: $purple-dark;
+      border-color: rgba($white, 0.4);
+      box-shadow: 0 6px 14px rgba($purple-dark, 0.22);
+    }
+  }
+
+  &__panel {
+    margin-top: 0.9rem;
+    height: 100%;
+  }
+
+  &__panel--offices {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+  }
+
+  &__panel--graph {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__panel--graph-only {
+    margin-top: 0;
+  }
+
+  &__graph-title {
+    font-size: 1.35rem;
+    margin: 0;
+  }
+
+  &__graph-subtitle {
+    margin: 0.25rem 0 0.85rem;
+    color: rgba($yellow-light, 0.8);
+    font-size: 0.9rem;
+  }
+
+  &__graph {
+    flex: 0 0 auto;
+    min-height: 0;
+  }
+
+  &__graph-svg {
+    width: 100%;
+    height: clamp(11rem, 22vh, 13.5rem);
+    min-height: 11rem;
+    display: block;
+  }
+
+  &__graph-grid {
+    stroke: rgba($white, 0.2);
+    stroke-width: 1;
+    stroke-dasharray: 2 5;
+  }
+
+  &__graph-axis-label {
+    fill: rgba($yellow-light, 0.75);
+    font-size: 0.85rem;
+  }
+
+  &__graph-area {
+    fill: rgba($yellow-dark, 0.14);
+  }
+
+  &__graph-line {
+    fill: none;
+    stroke: $yellow-dark;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  &__graph-point {
+    fill: $yellow-light;
+    stroke: $yellow-dark;
+    stroke-width: 2;
+  }
+
+  &__graph-value {
+    fill: rgba($yellow-light, 0.95);
+    font-size: 1.08rem;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba($purple-dark, 0.35);
+  }
+
+  &__graph-month {
+    fill: rgba($white, 0.9);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba($purple-dark, 0.35);
+  }
+
+  &__graph-empty {
+    color: rgba($yellow-light, 0.85);
+    margin: 0.25rem 0 0;
+  }
+
+  &__map,
+  &__fallback {
     display: block;
     width: 100%;
-    max-height: 340px;
-    object-fit: cover;
-    margin-top: 1rem;
+    min-height: 0;
+    height: 100%;
+    margin-top: 0;
     border-radius: $border-radius-small;
+  }
+  &__title {
+    font-size: 20px;
+    color: $yellow-dark;
+    margin-bottom: 10px;
+  }
+  &__text {
+    color: $white;
+    font-size: 16px;
+    padding-bottom: 5px;
+  }
+
+  &__map {
+    overflow: hidden;
+  }
+
+  &__map .mapboxgl-map,
+  &__map .mapboxgl-canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  &__fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    background: rgba($purple-faded, 0.28);
+    border: 1px dashed rgba($yellow-light, 0.65);
+    color: $yellow-light;
+    text-align: center;
+  }
+
+  &__fallback code {
+    color: $yellow-dark;
+    font-weight: 600;
   }
 }
 
@@ -36,6 +209,9 @@
   > * {
     width: 100%;
   }
+  &__title {
+    margin-bottom: 15px;
+  }
 
   &__office {
     color: $purple-dark;
@@ -44,9 +220,54 @@
     display: flex;
     flex-direction: column;
 
-    &__name {
-      font-size: 2.5rem;
+    &__content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;
+      container-type: inline-size;
     }
+
+    &__image {
+      width: 100%;
+      max-height: 7.5rem;
+      object-fit: contain;
+      border-radius: $border-radius-small;
+      background: rgba($white, 0.4);
+      padding: 0.5rem;
+    }
+
+    &__name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: clamp(1rem, 8cqi, 2rem);
+      line-height: 1.2;
+    }
+
+    &__dots {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-top: 0.25rem;
+    }
+
+    &__dot {
+      width: 0.42rem;
+      height: 0.42rem;
+      border-radius: 999px;
+      background: rgba(104, 37, 119, 0.35);
+      transition:
+        width 260ms ease,
+        background-color 260ms ease,
+        transform 260ms ease;
+
+      &.is-active {
+        width: 1.2rem;
+        background: #682577;
+        transform: translateY(-1px);
+      }
+    }
+
     &__trend {
       background-color: $purple-faded;
       padding: 0.3125rem 0.625rem;
@@ -70,6 +291,14 @@
       flex-direction: row;
       align-items: center;
       gap: 1rem;
+      min-width: 0;
+
+      p:last-child {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
     &__item {
       display: flex;
@@ -101,6 +330,44 @@
     }
   }
 }
+.mapboxgl-popup-content {
+  border-radius: $border-radius-small !important;
+  padding: 0.75rem;
+  background: $purple !important;
+  box-shadow: 0 2px 8px rgba($purple-dark, 0.3);
+}
+.mapboxgl-popup-close-button {
+  right: 15px !important;
+  top: 15px !important;
+}
+.mapboxgl-popup-anchor-top .mapboxgl-popup-tip {
+  border-top-color: $purple-faded !important;
+  border-bottom-color: $purple-faded !important;
+}
+.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip {
+  border-top-color: $purple-faded !important;
+  border-bottom-color: $purple-faded !important;
+}
+
+.highlight-rotate-enter-active,
+.highlight-rotate-leave-active {
+  transition:
+    opacity 360ms ease,
+    transform 360ms ease,
+    filter 360ms ease;
+}
+
+.highlight-rotate-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+  filter: blur(1.5px);
+}
+
+.highlight-rotate-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+  filter: blur(1.5px);
+}
 
 @media (max-width: 1024px) {
   .c-middlesection {
@@ -120,11 +387,51 @@
       flex: 1 1 0;
     }
   }
+
+  .c-map {
+    &__map,
+    &__fallback {
+      min-height: 320px;
+      height: auto;
+    }
+  }
 }
 
 @media (max-width: 768px) {
   .c-middlesection {
     gap: 1rem;
+  }
+
+  .c-map {
+    &__tabs {
+      width: 100%;
+    }
+
+    &__tab {
+      flex: 1 1 auto;
+      text-align: center;
+      font-size: 0.88rem;
+      padding: 0.3rem 0.7rem;
+    }
+
+    &__graph-svg {
+      height: clamp(13rem, 38vh, 16rem);
+      min-height: 13rem;
+    }
+
+    &__graph-value {
+      font-size: 1.22rem;
+    }
+
+    &__graph-month {
+      font-size: 1.02rem;
+    }
+
+    &__map,
+    &__fallback {
+      min-height: 280px;
+      height: auto;
+    }
   }
 
   .c-stats {
@@ -137,6 +444,41 @@
   }
 
   .c-stats__office__name {
-    font-size: 2rem;
+    font-size: clamp(1.4rem, 8vw, 2rem);
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .c-stats__users__name p:last-child {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+}
+
+@media (max-width: 480px) {
+  .c-map {
+    &__map,
+    &__fallback {
+      min-height: 240px;
+    }
+
+    &__graph-svg {
+      height: clamp(12rem, 46vh, 14rem);
+      min-height: 12rem;
+    }
+
+    &__graph-value {
+      font-size: 1.08rem;
+    }
+
+    &__graph-month {
+      font-size: 0.92rem;
+    }
+  }
+
+  .c-stats__users__item {
+    align-items: flex-start;
   }
 }
