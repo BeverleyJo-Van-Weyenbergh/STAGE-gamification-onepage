@@ -340,7 +340,12 @@ onBeforeUnmount(() => {
   <div class="c-middlesection">
     <div class="c-map-container">
       <div class="c-map card-bg">
-        <div v-if="hasMultipleOffices" class="c-map__tabs" role="tablist" aria-label="Kantoren en graph">
+        <div
+          v-if="hasMultipleOffices"
+          class="c-map__tabs"
+          role="tablist"
+          aria-label="Kantoren en graph"
+        >
           <button
             class="c-map__tab"
             :class="{ 'is-active': activeMapTab === 'offices' }"

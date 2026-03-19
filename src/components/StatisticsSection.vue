@@ -186,8 +186,7 @@ const runStatsAnimation = () => {
     statsAnimationTimeouts.push(timeoutId)
   })
 
-  const totalDelayMs =
-    baseDelayMs + stepDelayMs * (cardsToAnimate - 1) + cardRevealDurationMs
+  const totalDelayMs = baseDelayMs + stepDelayMs * (cardsToAnimate - 1) + cardRevealDurationMs
 
   const completionTimeoutId = window.setTimeout(() => {
     emit('animation-complete')
@@ -256,7 +255,11 @@ onMounted(() => {
         <p class="c-statistics__subtext">Bedrijfsbreed</p>
       </div>
     </div>
-    <div v-if="showMiniGraph" class="c-statistics__card card-bg" :class="{ 'is-visible': statsCardsVisible[3] }">
+    <div
+      v-if="showMiniGraph"
+      class="c-statistics__card card-bg"
+      :class="{ 'is-visible': statsCardsVisible[3] }"
+    >
       <h2 class="c-statistics__title">Laatste 6 maanden</h2>
       <div v-if="chartPoints.length > 0" class="c-statistics__graph">
         <svg
